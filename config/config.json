@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "Infinite10^^",
+    "database": "songcomments",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "Infinite10^^",
+    "database": "songcomments",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "Infinite10^^",
+    "database": "songcomments",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

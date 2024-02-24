@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <div class="timeline">
+    {% if user %}
+      <div>
+        <form id="cmt-form" action="/post" method="POST" enctype="multipart/form-data">
+          <div class="input-group">
+            <textarea id="cmt" name="content"></textarea>
+          </div>
+          <div class="audio-preview">
+            <audio id="audio-preview" src="" style="display: none;" controls></audio>
+            <input id="audio-url" type="hidden" name="url">
+          </div>
+          <div>
+            <label id="audio-label" for="audio">음악 가져오기</label>
+            <input id="audio" type="file" accept="audio/*">
+            <button id="cmt-btn" type="submit" class="btn">등록</button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+    <div class="cmts">
+      {% for cmt in cmts %}
+        <div class="cmt">
+          <input type="hidden" value="{{cmt.User.id}}" class="cmt-user-id">
+          <input type="hidden" value="{{cmt.id}}" class="cmt-id">
+          <div class="cmt-author">{{cmt.User.nick}}</div>
+            {% if cmt.User.id === user.id %}
+            <button id="modify" type="button" value="{{cmt.id}}" class="btn">수정</button>
+            <button id="delete" type="button" value="{{cmt.id}}" class="btn">삭제</button>
+            {% endif %}
+          <div class="cmt-content">{{cmt.content}}</div>
+          {% if cmt.audio %}
+            <div class="cmt-audio"><audio src="{{cmt.audio}}" controls></audio></div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    if (document.getElementById('audio')) {
+      document.getElementById('audio').addEventListener('change', function(e) {
+        const formData = new FormData();
+        console.log(this, this.files);
+        formData.append('media', this.files[0]);
+        axios.post('/post/audio', formData)
+          .then((res) => {
+            document.getElementById('audio-url').value = res.data.url;
+            document.getElementById('audio-preview').src = res.data.url;
+            document.getElementById('audio-preview').style.display = 'inline';
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
+    }
+    // 수정 클릭 시
+    document.getElementById('modify').addEventListener('click', function(e) {
+      const newContent = prompt('바꿀 내용 입력');
+      if (!newContent) {
+        return alert('반드시 입력');
+      }
+      try {
+        axios.put(`/post/${e.target.value}`, { content: newContent });
+      } catch (err) {
+          console.error(err);
+      };
+    });
+    // 삭제 클릭 시
+    document.getElementById('delete').addEventListener('click', function(e) {
+      try {
+        axios.delete(`/post/${e.target.value}`);
+      } catch (err) {
+        console.error(err);
+      };
+    });
+  </script>
+{% endblock %}
